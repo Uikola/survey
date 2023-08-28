@@ -1,1 +1,2 @@
-DROP TABLE surveys
+DROP TABLE surveys;
+DROP TABLE questions
