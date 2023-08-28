@@ -15,7 +15,7 @@ func NewUseCase(surveyRepo surveyRepo.SurveyRepo) *UseCase {
 	return &UseCase{repo: surveyRepo}
 }
 
-func (uc *UseCase) CreateSurvey(ctx context.Context, log logrus.FieldLogger, survey *entities.Survey) (*entities.Survey, error) {
+func (uc *UseCase) StartSurvey(ctx context.Context, log logrus.FieldLogger, survey *entities.Survey) (*entities.Survey, error) {
 	return uc.repo.CreateSurvey(ctx, log, survey)
 }
 

@@ -38,7 +38,7 @@ func New(uCase *surveyUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 		}
 
 		survey := in.SurveyFromDTO()
-		response, err := uCase.CreateSurvey(ctx, log, survey)
+		response, err := uCase.StartSurvey(ctx, log, survey)
 		if err != nil {
 			log.Errorf("can't create the survey: %s", err.Error())
 			http.Error(w, "create survey err:"+err.Error(), http.StatusInternalServerError)

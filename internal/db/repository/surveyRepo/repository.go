@@ -28,7 +28,7 @@ func (r *Repository) CreateSurvey(ctx context.Context, log logrus.FieldLogger, s
 
 	rows, err := r.db.QueryContext(ctx, query, survey.Title)
 	if err != nil {
-		log.Errorf("query execution error")
+		log.Errorf("query execution error: %s", err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -38,12 +38,12 @@ func (r *Repository) CreateSurvey(ctx context.Context, log logrus.FieldLogger, s
 	for rows.Next() {
 		err = rows.Scan(&id, &title)
 		if err != nil {
-			log.Errorf("error while scanning")
+			log.Errorf("error while scanning: %s", err.Error())
 			return nil, err
 		}
 	}
 	if rows.Err() != nil {
-		log.Errorf("rows error")
+		log.Errorf("rows error: %s", rows.Err())
 		return nil, rows.Err()
 	}
 

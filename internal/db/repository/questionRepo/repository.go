@@ -35,7 +35,7 @@ func (r *Repository) CreateQuestion(ctx context.Context, log logrus.FieldLogger,
 	var text string
 
 	for rows.Next() {
-		err = rows.Scan(&id, &surveyID, text)
+		err = rows.Scan(&id, &text, &surveyID)
 		if err != nil {
 			log.Errorf("error while scanning: %s", err.Error())
 			return nil, err
