@@ -13,6 +13,7 @@ type Repository struct {
 
 type QuestionRepo interface {
 	CreateQuestion(ctx context.Context, log logrus.FieldLogger, question *entities.Question) (*entities.Question, error)
+	DeleteQuestion(ctx context.Context, log logrus.FieldLogger, surveyID, questionID uint64) error
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -51,4 +52,18 @@ func (r *Repository) CreateQuestion(ctx context.Context, log logrus.FieldLogger,
 		Text:     text,
 		SurveyID: surveyID,
 	}, nil
+}
+
+func (r *Repository) DeleteQuestion(ctx context.Context, log logrus.FieldLogger, surveyID, questionID uint64) error {
+	query := `
+	DELETE FROM questions
+	WHERE id = $1 AND survey_id = $2`
+
+	_, err := r.db.ExecContext(ctx, query, questionID, surveyID)
+	if err != nil {
+		log.Errorf("query execution error: %s", err.Error())
+		return err
+	}
+
+	return nil
 }

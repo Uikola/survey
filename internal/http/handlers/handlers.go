@@ -7,6 +7,7 @@ import (
 	"survey/internal/db/repository/questionRepo"
 	"survey/internal/db/repository/surveyRepo"
 	"survey/internal/http/handlers/addQuestion"
+	"survey/internal/http/handlers/deleteQuestion"
 	"survey/internal/http/handlers/deleteSurvey"
 	"survey/internal/http/handlers/startSurvey"
 	"survey/internal/usecases/questionUC"
@@ -22,4 +23,5 @@ func Router(db *sql.DB, router chi.Router, log logrus.FieldLogger) {
 	router.Post("/start-survey", startSurvey.New(surveyUseCase, log))
 	router.Post("/delete-survey", deleteSurvey.New(surveyUseCase, log))
 	router.Post("/add-question", addQuestion.New(questionUseCase, log))
+	router.Post("/delete-question", deleteQuestion.New(questionUseCase, log))
 }
