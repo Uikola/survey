@@ -1,2 +1,3 @@
-DROP TABLE surveys;
-DROP TABLE questions
+DROP TABLE answers;
+DROP TABLE questions;
+DROP TABLE surveys
