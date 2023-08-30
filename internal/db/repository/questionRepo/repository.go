@@ -16,7 +16,7 @@ type QuestionRepo interface {
 	DeleteQuestion(ctx context.Context, log logrus.FieldLogger, surveyID, questionID uint64) error
 }
 
-func NewRepository(db *sql.DB) *Repository {
+func NewQuestionRepo(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
