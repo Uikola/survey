@@ -11,14 +11,12 @@ import (
 )
 
 var ErrInvalidText = errors.New("invalid text")
-var ErrInvalidQuestionID = errors.New("invalid question id")
 var ErrInvalidSurveyID = errors.New("invalid survey id")
 
 func (in *Input) AnswerFromDTO() *entities.Answer {
 	return &entities.Answer{
-		Text:       in.Text,
-		SurveyID:   in.SurveyID,
-		QuestionID: in.QuestionID,
+		Text:     in.Text,
+		SurveyID: in.SurveyID,
 	}
 }
 

@@ -1,36 +1,26 @@
 package deleteSurvey
 
 import (
-	"encoding/json"
-	"errors"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 	"survey/internal/usecases/surveyUC"
 )
-
-var ErrInvalidSurveyID = errors.New("invalid surveyID")
 
 func New(uCase *surveyUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		in := &Input{}
-		err := json.NewDecoder(r.Body).Decode(&in)
+		surveyID, err := strconv.Atoi(chi.URLParam(r, "survey_id"))
 		if err != nil {
-			log.Errorf("can't parse the request %s", err.Error())
-			http.Error(w, "bad json(parsing)"+err.Error(), http.StatusBadRequest)
+			log.Errorf("Invalid survey id")
+			http.Error(w, "Invalid survey id", http.StatusBadRequest)
 			return
 		}
 
-		err = validateReq(in)
-		if err != nil {
-			log.Errorf("can't validate the data: %s", err.Error())
-			http.Error(w, "bad json(validating)"+err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		err = uCase.DeleteSurvey(ctx, log, in.SurveyID)
+		err = uCase.DeleteSurvey(ctx, log, uint64(surveyID))
 		if err != nil {
 			log.Errorf("can't delete the survey")
 			http.Error(w, "can't delete the survey"+err.Error(), http.StatusInternalServerError)

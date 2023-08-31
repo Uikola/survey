@@ -36,7 +36,6 @@ func New(uCase *surveyUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			http.Error(w, "bad json(validating):"+err.Error(), http.StatusBadRequest)
 			return
 		}
-
 		survey := in.SurveyFromDTO()
 		response, err := uCase.StartSurvey(ctx, log, survey)
 		if err != nil {

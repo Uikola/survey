@@ -1,6 +1,6 @@
-package addQuestion
+package vote
 
 type Input struct {
-	Text     string `json:"text"`
+	AnswerID uint64 `json:"answer_id"`
 	SurveyID uint64 `json:"survey_id"`
 }

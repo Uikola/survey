@@ -1,6 +1,7 @@
 package entities
 
 type Survey struct {
-	ID    uint64
-	Title string
+	ID      uint64
+	Title   string
+	Answers []Answer
 }

@@ -19,6 +19,10 @@ func (uc *UseCase) AddAnswer(ctx context.Context, log logrus.FieldLogger, answer
 	return uc.repo.CreateAnswer(ctx, log, answer)
 }
 
-func (uc *UseCase) DeleteAnswer(ctx context.Context, log logrus.FieldLogger, answerID, questionID, surveyID uint64) error {
-	return uc.repo.DeleteAnswer(ctx, log, answerID, questionID, surveyID)
+func (uc *UseCase) DeleteAnswer(ctx context.Context, log logrus.FieldLogger, answerID, surveyID uint64) error {
+	return uc.repo.DeleteAnswer(ctx, log, answerID, surveyID)
+}
+
+func (uc *UseCase) Vote(ctx context.Context, log logrus.FieldLogger, answerID, surveyID uint64) error {
+	return uc.repo.Vote(ctx, log, answerID, surveyID)
 }

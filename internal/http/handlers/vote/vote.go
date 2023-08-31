@@ -1,4 +1,4 @@
-package deleteQuestion
+package vote
 
 import (
 	"encoding/json"
@@ -6,21 +6,20 @@ import (
 	"github.com/go-chi/render"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"survey/internal/usecases/questionUC"
+	"survey/internal/usecases/answerUC"
 )
 
-var ErrInvalidSurveyID = errors.New("invalid survey id")
-var ErrInvalidQuestionID = errors.New("invalid question id")
+var ErrInvalidAID = errors.New("invalid answer id")
+var ErrInvalidSID = errors.New("invalid survey id")
 
-func New(uCase *questionUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
+func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-
 		in := &Input{}
 		err := json.NewDecoder(r.Body).Decode(&in)
 		if err != nil {
 			log.Errorf("can't parse the request: %s", err.Error())
-			http.Error(w, "bad json(parsing)"+err.Error(), http.StatusBadRequest)
+			http.Error(w, "bad json"+err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -31,15 +30,15 @@ func New(uCase *questionUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		err = uCase.DeleteQuestion(ctx, log, in.SurveyID, in.QuestionID)
+		err = uCase.Vote(ctx, log, in.AnswerID, in.SurveyID)
 		if err != nil {
-			log.Errorf("can't delete question: %s", err.Error())
-			http.Error(w, "can't delete question"+err.Error(), http.StatusInternalServerError)
+			log.Errorf("voting error: %s", err.Error())
+			http.Error(w, "voting error"+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		render.JSON(w, r, map[string]interface{}{
-			"message": "question deleted",
+			"message": "vote counted successfully",
 		})
 	}
 }
