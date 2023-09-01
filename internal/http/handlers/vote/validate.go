@@ -1,10 +1,10 @@
 package vote
 
 func validateReq(in *Input) error {
-	if in.AnswerID < 0 {
+	if in.AnswerID < 1 {
 		return ErrInvalidAID
 	}
-	if in.SurveyID < 0 {
+	if in.SurveyID < 1 {
 		return ErrInvalidSID
 	}
 	return nil

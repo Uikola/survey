@@ -9,6 +9,7 @@ import (
 	"survey/internal/http/handlers/addAnswer"
 	"survey/internal/http/handlers/deleteAnswer"
 	"survey/internal/http/handlers/deleteSurvey"
+	"survey/internal/http/handlers/getResult"
 	"survey/internal/http/handlers/startSurvey"
 	"survey/internal/http/handlers/vote"
 	"survey/internal/usecases/answerUC"
@@ -22,6 +23,7 @@ func Router(db *sql.DB, router chi.Router, log logrus.FieldLogger) {
 	answerUseCase := answerUC.NewUseCase(answerRepository)
 
 	router.Route("/api", func(r chi.Router) {
+		r.Post("/getResult", getResult.New(surveyUseCase, log))
 		r.Post("/start-survey", startSurvey.New(surveyUseCase, log))
 		r.Delete("/delete-survey/{survey_id}", deleteSurvey.New(surveyUseCase, log))
 		r.Post("/add-ans", addAnswer.New(answerUseCase, log))

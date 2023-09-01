@@ -22,3 +22,7 @@ func (uc *UseCase) StartSurvey(ctx context.Context, log logrus.FieldLogger, surv
 func (uc *UseCase) DeleteSurvey(ctx context.Context, log logrus.FieldLogger, surveyID uint64) error {
 	return uc.repo.DeleteSurvey(ctx, log, surveyID)
 }
+
+func (uc *UseCase) GetResult(ctx context.Context, log logrus.FieldLogger, surveyID uint64) (*entities.Survey, error) {
+	return uc.repo.GetResult(ctx, log, surveyID)
+}
