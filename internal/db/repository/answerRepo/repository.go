@@ -11,6 +11,7 @@ type Repository struct {
 	db *sql.DB
 }
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock_repository.go
 type AnswerRepo interface {
 	CreateAnswer(ctx context.Context, log logrus.FieldLogger, answer *entities.Answer) (*entities.Answer, error)
 	DeleteAnswer(ctx context.Context, log logrus.FieldLogger, answerID, surveyID uint64) error
