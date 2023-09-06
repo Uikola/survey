@@ -1,4 +1,4 @@
-package addAnswer_test
+package vote_test
 
 import (
 	"bytes"
@@ -10,44 +10,33 @@ import (
 	"net/http"
 	"net/http/httptest"
 	mock_answer "survey/internal/db/repository/answerRepo/mocks"
-	"survey/internal/entities"
-	"survey/internal/http/handlers/addAnswer"
+	"survey/internal/http/handlers/vote"
 	"survey/internal/usecases/answerUC"
 	"survey/pkg/logger"
 	"testing"
 )
 
-func TestAddAns(t *testing.T) {
+func TestVote(t *testing.T) {
 	log := logger.New()
 	ctx := context.Background()
-	ans := &entities.Answer{
-		Text:     "Test Ans",
-		SurveyID: 1,
-	}
+	answerID := uint64(1)
+	surveyID := uint64(1)
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	repo := mock_answer.NewMockAnswerRepo(ctrl)
 
-	exp := &entities.Answer{
-		ID:       1,
-		Text:     "Test Ans",
-		SurveyID: 1,
-		Votes:    0,
-	}
-	repo.EXPECT().CreateAnswer(ctx, log, ans).Return(exp, nil).Times(1)
+	repo.EXPECT().Vote(ctx, log, answerID, surveyID).Return(nil).Times(1)
 
 	uCase := answerUC.NewUseCase(repo)
-	h := addAnswer.New(uCase, log)
-
+	h := vote.New(uCase, log)
 	serverFunc := h.ServeHTTP
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/api/add-ans",
-		bytes.NewBuffer([]byte(`{"text": "Test Ans", "survey_id": 1}`)),
+		"/vote",
+		bytes.NewBuffer([]byte(`{"answer_id":1,"survey_id":1}`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -58,95 +47,27 @@ func TestAddAns(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := `{"ID":1,"Text":"Test Ans","SurveyID":1,"Votes":0}` + "\n"
+	expected := `{"message":"vote counted successfully"}` + "\n"
 
 	require.Equal(t, expected, string(data))
+
 }
 
-func TestAddAnsBadJSON(t *testing.T) {
+func TestVoteBadJSON(t *testing.T) {
 	log := logger.New()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	repo := mock_answer.NewMockAnswerRepo(ctrl)
 	uCase := answerUC.NewUseCase(repo)
-	h := addAnswer.New(uCase, log)
-
+	h := vote.New(uCase, log)
 	serverFunc := h.ServeHTTP
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/api/add-ans",
-		bytes.NewBuffer([]byte(`{"text": "Test Ans", "survey_id": 1`)),
-	)
-	serverFunc(rec, req)
-
-	result := rec.Result()
-	defer result.Body.Close()
-
-	data, err := io.ReadAll(result.Body)
-	require.NoError(t, err)
-
-	expected := "bad json(parsing): unexpected EOF\n"
-	require.Equal(t, expected, string(data))
-}
-
-func TestAddAnsBadReq(t *testing.T) {
-	log := logger.New()
-
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	repo := mock_answer.NewMockAnswerRepo(ctrl)
-	uCase := answerUC.NewUseCase(repo)
-	h := addAnswer.New(uCase, log)
-
-	serverFunc := h.ServeHTTP
-
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(
-		http.MethodPost,
-		"/api/add-ans",
-		bytes.NewBuffer([]byte(`{"text": "", "survey_id": 1}`)),
-	)
-	serverFunc(rec, req)
-
-	result := rec.Result()
-	defer result.Body.Close()
-
-	data, err := io.ReadAll(result.Body)
-	require.NoError(t, err)
-	require.Equal(t, "bad json(validating): invalid text\n", string(data))
-}
-
-func TestAddAnsUCaseError(t *testing.T) {
-	log := logger.New()
-	ctx := context.Background()
-	ans := &entities.Answer{
-		Text:     "Test Ans",
-		SurveyID: 1,
-	}
-
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	repo := mock_answer.NewMockAnswerRepo(ctrl)
-
-	repoErr := errors.New("can't create the answer, db is down")
-	repo.EXPECT().CreateAnswer(ctx, log, ans).Return(nil, repoErr).Times(1)
-
-	uCase := answerUC.NewUseCase(repo)
-	h := addAnswer.New(uCase, log)
-
-	serverFunc := h.ServeHTTP
-
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(
-		http.MethodPost,
-		"/api/add-ans",
-		bytes.NewBuffer([]byte(`{"text": "Test Ans", "survey_id": 1}`)),
+		"/vote",
+		bytes.NewBuffer([]byte(`{"answer_id":1,"survey_id":1`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -157,7 +78,75 @@ func TestAddAnsUCaseError(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := "can't add a new answer: can't create the answer, db is down\n"
+	expected := "bad json: unexpected EOF\n"
 
 	require.Equal(t, expected, string(data))
+}
+
+func TestVoteBadReq(t *testing.T) {
+	log := logger.New()
+
+	ctrl := gomock.NewController(t)
+
+	repo := mock_answer.NewMockAnswerRepo(ctrl)
+	uCase := answerUC.NewUseCase(repo)
+	h := vote.New(uCase, log)
+	serverFunc := h.ServeHTTP
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/vote",
+		bytes.NewBuffer([]byte(`{"answer_id":1,"survey_id":0}`)),
+	)
+	req.Header.Set("Content-Type", "Application/Json")
+	serverFunc(rec, req)
+
+	result := rec.Result()
+	defer result.Body.Close()
+
+	data, err := io.ReadAll(result.Body)
+	require.NoError(t, err)
+
+	expected := "bad json(validating): invalid survey id\n"
+
+	require.Equal(t, expected, string(data))
+}
+
+func TestVoteUCError(t *testing.T) {
+	log := logger.New()
+	ctx := context.Background()
+	answerID := uint64(1)
+	surveyID := uint64(1)
+
+	ctrl := gomock.NewController(t)
+
+	repo := mock_answer.NewMockAnswerRepo(ctrl)
+
+	repoErr := errors.New("db is down")
+	repo.EXPECT().Vote(ctx, log, answerID, surveyID).Return(repoErr).Times(1)
+
+	uCase := answerUC.NewUseCase(repo)
+	h := vote.New(uCase, log)
+	serverFunc := h.ServeHTTP
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/vote",
+		bytes.NewBuffer([]byte(`{"answer_id":1,"survey_id":1}`)),
+	)
+	req.Header.Set("Content-Type", "Application/Json")
+	serverFunc(rec, req)
+
+	result := rec.Result()
+	defer result.Body.Close()
+
+	data, err := io.ReadAll(result.Body)
+	require.NoError(t, err)
+
+	expected := "voting error: db is down\n"
+
+	require.Equal(t, expected, string(data))
+
 }

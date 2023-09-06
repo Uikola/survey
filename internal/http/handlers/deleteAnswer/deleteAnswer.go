@@ -14,13 +14,13 @@ func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 		ctx := r.Context()
 
 		surveyID, err := strconv.Atoi(chi.URLParam(r, "survey_id"))
-		if err != nil {
+		if err != nil || surveyID < 1 {
 			log.Errorf("Invalid survey ID")
 			http.Error(w, "Invalid survey ID", http.StatusBadRequest)
 			return
 		}
 		answerID, err := strconv.Atoi(chi.URLParam(r, "ans_id"))
-		if err != nil {
+		if err != nil || answerID < 1 {
 			log.Errorf("Invalid answer ID")
 			http.Error(w, "Invalid answer ID", http.StatusBadRequest)
 			return

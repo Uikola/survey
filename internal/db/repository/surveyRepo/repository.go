@@ -11,6 +11,7 @@ type Repository struct {
 	db *sql.DB
 }
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock_repository.go
 type SurveyRepo interface {
 	CreateSurvey(ctx context.Context, log logrus.FieldLogger, survey *entities.Survey) (*entities.Survey, error)
 	DeleteSurvey(ctx context.Context, logger logrus.FieldLogger, surveyID uint64) error
@@ -68,6 +69,7 @@ func (r *Repository) DeleteSurvey(ctx context.Context, log logrus.FieldLogger, s
 }
 
 func (r *Repository) GetResult(ctx context.Context, log logrus.FieldLogger, surveyID uint64) (*entities.Survey, error) {
+	//TODO transaction
 	query := `
 	SELECT id, title
 	FROM surveys

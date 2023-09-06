@@ -19,21 +19,21 @@ func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&in)
 		if err != nil {
 			log.Errorf("can't parse the request: %s", err.Error())
-			http.Error(w, "bad json"+err.Error(), http.StatusBadRequest)
+			http.Error(w, "bad json: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		err = validateReq(in)
 		if err != nil {
 			log.Errorf("can't validate the data: %s", err.Error())
-			http.Error(w, "bad json(validating)"+err.Error(), http.StatusBadRequest)
+			http.Error(w, "bad json(validating): "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		err = uCase.Vote(ctx, log, in.AnswerID, in.SurveyID)
 		if err != nil {
 			log.Errorf("voting error: %s", err.Error())
-			http.Error(w, "voting error"+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "voting error: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
