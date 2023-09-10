@@ -1,6 +1,6 @@
 package vote
 
-func validateReq(in *Input) error {
+func ValidateReq(in *Input) error {
 	if in.AnswerID < 1 {
 		return ErrInvalidAID
 	}

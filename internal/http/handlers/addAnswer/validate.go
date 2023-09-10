@@ -1,6 +1,6 @@
 package addAnswer
 
-func validateReq(in *Input) error {
+func ValidateReq(in *Input) error {
 	if in.Text == "" {
 		return ErrInvalidText
 	}

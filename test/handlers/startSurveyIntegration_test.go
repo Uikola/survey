@@ -1,4 +1,4 @@
-package getResult_test
+package test
 
 import (
 	"bytes"
@@ -9,53 +9,42 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	mock_survey "survey/internal/db/repository/surveyRepo/mocks"
 	"survey/internal/entities"
-	"survey/internal/http/handlers/getResult"
+	"survey/internal/http/handlers/startSurvey"
 	"survey/internal/usecases/surveyUC"
 	"survey/pkg/logger"
+	mock_surveyRepo "survey/test/mocks"
 	"testing"
 )
 
-func TestGetResult(t *testing.T) {
-	ctx := context.Background()
+func TestStartSurvey(t *testing.T) {
 	log := logger.New()
-	surveyID := uint64(1)
-
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	repo := mock_survey.NewMockSurveyRepo(ctrl)
-
-	exp := &entities.Survey{
-		ID:    1,
-		Title: "Test Title",
-		Answers: []entities.Answer{
-			{
-				ID:       1,
-				Text:     "test",
-				SurveyID: 1,
-				Votes:    5,
-			},
-			{
-				ID:       2,
-				Text:     "testTest",
-				SurveyID: 1,
-				Votes:    3,
-			},
-		},
+	ctx := context.Background()
+	survey := &entities.Survey{
+		Title: "Test Survey",
 	}
 
-	repo.EXPECT().GetResult(ctx, log, surveyID).Return(exp, nil).Times(1)
-	uCase := surveyUC.NewUseCase(repo)
-	h := getResult.New(uCase, log)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
+	repo := mock_surveyRepo.NewMockSurveyRepo(ctrl)
+
+	exp := &entities.Survey{
+		ID:      1,
+		Title:   "Test Survey",
+		Answers: nil,
+	}
+	repo.EXPECT().CreateSurvey(ctx, log, survey).Return(exp, nil).Times(1)
+
+	uCase := surveyUC.NewUseCase(repo)
+	h := startSurvey.New(uCase, log)
 	serverFunc := h.ServeHTTP
+
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/getResult",
-		bytes.NewBuffer([]byte(`{"survey_id": 1}`)),
+		"/start-survey",
+		bytes.NewBuffer([]byte(`{"title": "Test Survey"}`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -66,27 +55,30 @@ func TestGetResult(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := `{"ID":1,"Title":"Test Title","Answers":[{"ID":1,"Text":"test","SurveyID":1,"Votes":5},{"ID":2,"Text":"testTest","SurveyID":1,"Votes":3}]}` + "\n"
-	require.Equal(t, expected, string(data))
+	expected := `{"ID":1,"Title":"Test Survey","Answers":null}` + "\n"
 
+	require.Equal(t, expected, string(data))
 }
 
-func TestGetResultBadJSON(t *testing.T) {
+func TestStartSurveyBadJSON(t *testing.T) {
 	log := logger.New()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mock_survey.NewMockSurveyRepo(ctrl)
+	repo := mock_surveyRepo.NewMockSurveyRepo(ctrl)
+
 	uCase := surveyUC.NewUseCase(repo)
-	h := getResult.New(uCase, log)
+
+	h := startSurvey.New(uCase, log)
 
 	serverFunc := h.ServeHTTP
+
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/getResult",
-		bytes.NewBuffer([]byte(`{"survey_id": 1`)),
+		"/start-survey",
+		bytes.NewBuffer([]byte(`{"title": "Test Survey"`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -97,27 +89,30 @@ func TestGetResultBadJSON(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := "bad json(parsing): unexpected EOF\n"
-	require.Equal(t, expected, string(data))
+	expected := "bad json(parsing):unexpected EOF\n"
 
+	require.Equal(t, expected, string(data))
 }
 
-func TestGetResultBadReq(t *testing.T) {
+func TestStartSurveyBadReq(t *testing.T) {
 	log := logger.New()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mock_survey.NewMockSurveyRepo(ctrl)
+	repo := mock_surveyRepo.NewMockSurveyRepo(ctrl)
+
 	uCase := surveyUC.NewUseCase(repo)
-	h := getResult.New(uCase, log)
+
+	h := startSurvey.New(uCase, log)
 
 	serverFunc := h.ServeHTTP
+
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/getResult",
-		bytes.NewBuffer([]byte(`{"survey_id": 0}`)),
+		"/start-survey",
+		bytes.NewBuffer([]byte(`{"title": ""}`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -128,32 +123,35 @@ func TestGetResultBadReq(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := "bad json(validating): invalid survey id\n"
-	require.Equal(t, expected, string(data))
+	expected := "bad json(validating):invalid title\n"
 
+	require.Equal(t, expected, string(data))
 }
 
-func TestGetResultUCError(t *testing.T) {
+func TestStartSurveyUCError(t *testing.T) {
+	log := logger.New()
 	ctx := context.Background()
-	log := logger.New()
-	surveyID := uint64(1)
+	survey := &entities.Survey{
+		Title: "Test Survey",
+	}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mock_survey.NewMockSurveyRepo(ctrl)
+	repo := mock_surveyRepo.NewMockSurveyRepo(ctrl)
 
-	repoErr := errors.New("db is down")
-	repo.EXPECT().GetResult(ctx, log, surveyID).Return(nil, repoErr).Times(1)
+	repoErr := errors.New("can't create the survey, db is down")
+	repo.EXPECT().CreateSurvey(ctx, log, survey).Return(nil, repoErr).Times(1)
+
 	uCase := surveyUC.NewUseCase(repo)
-	h := getResult.New(uCase, log)
-
+	h := startSurvey.New(uCase, log)
 	serverFunc := h.ServeHTTP
+
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/getResult",
-		bytes.NewBuffer([]byte(`{"survey_id": 1}`)),
+		"/start-survey",
+		bytes.NewBuffer([]byte(`{"title": "Test Survey"}`)),
 	)
 	req.Header.Set("Content-Type", "Application/Json")
 	serverFunc(rec, req)
@@ -164,7 +162,7 @@ func TestGetResultUCError(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := "can't get result: db is down\n"
-	require.Equal(t, expected, string(data))
+	expected := "create survey err:can't create the survey, db is down\n"
 
+	require.Equal(t, expected, string(data))
 }

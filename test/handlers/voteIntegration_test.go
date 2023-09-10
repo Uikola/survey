@@ -1,4 +1,4 @@
-package vote_test
+package test
 
 import (
 	"bytes"
@@ -9,10 +9,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	mock_answer "survey/internal/db/repository/answerRepo/mocks"
 	"survey/internal/http/handlers/vote"
 	"survey/internal/usecases/answerUC"
 	"survey/pkg/logger"
+	mock_answer "survey/test/mocks"
 	"testing"
 )
 
@@ -47,7 +47,7 @@ func TestVote(t *testing.T) {
 	data, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 
-	expected := `{"message":"vote counted successfully"}` + "\n"
+	expected := `{"Message":"vote counted successfully"}` + "\n"
 
 	require.Equal(t, expected, string(data))
 

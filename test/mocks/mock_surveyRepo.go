@@ -2,7 +2,7 @@
 // Source: repository.go
 
 // Package mock_surveyRepo is a generated GoMock package.
-package mock_surveyRepo
+package mocks
 
 import (
 	context "context"

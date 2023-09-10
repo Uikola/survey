@@ -1,4 +1,4 @@
-package addAnswer_test
+package test
 
 import (
 	"bytes"
@@ -9,11 +9,11 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	mock_answer "survey/internal/db/repository/answerRepo/mocks"
 	"survey/internal/entities"
 	"survey/internal/http/handlers/addAnswer"
 	"survey/internal/usecases/answerUC"
 	"survey/pkg/logger"
+	mock_answer "survey/test/mocks"
 	"testing"
 )
 

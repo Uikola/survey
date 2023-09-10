@@ -2,7 +2,7 @@
 // Source: repository.go
 
 // Package mock_answerRepo is a generated GoMock package.
-package mock_answerRepo
+package mocks
 
 import (
 	reflect "reflect"
