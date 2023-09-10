@@ -6,9 +6,22 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+	"survey/internal/entities"
 	"survey/internal/usecases/answerUC"
 )
 
+// New @Summary Delete an answer
+//
+//	@Description	Deletes an answer
+//	@Tags			answer
+//	@Accept			json
+//	@Produce		json
+//	@Param			survey_id	path		int	true	"Survey ID"
+//	@Param			ans_id	path		int	true	"Answer ID"
+//	@Success		200			{object}	entities.Response
+//	@Failure		400			{object}	string
+//	@Failure		500			{object}	string
+//	@Router			/delete-ans/{survey_id}/{ans_id} [delete]
 func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -33,8 +46,6 @@ func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		render.JSON(w, r, map[string]interface{}{
-			"message": "answer deleted",
-		})
+		render.JSON(w, r, entities.Response{Message: "Answer deleted successfully"})
 	}
 }

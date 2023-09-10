@@ -18,6 +18,17 @@ func (in *Input) SurveyFromDTO() *entities.Survey {
 	}
 }
 
+// New @Summary Add an answer
+//
+//	@Description	Starts a new survey
+//	@Tags			survey
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		Input	true	"startSurvey input"
+//	@Success		200		{object}	entities.Survey
+//	@Failure		400		{object}	string
+//	@Failure		500		{object}	string
+//	@Router			/start-survey [post]
 func New(uCase *surveyUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -30,7 +41,7 @@ func New(uCase *surveyUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		err = validateReq(in)
+		err = ValidateReq(in)
 		if err != nil {
 			log.Errorf("can't validate the data: &s", err.Error())
 			http.Error(w, "bad json(validating):"+err.Error(), http.StatusBadRequest)

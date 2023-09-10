@@ -12,6 +12,13 @@ import (
 	"net/http"
 )
 
+//	@title			Survey
+//	@version		1.0
+//	@description	API Server for Survey Application
+
+//	@host		localhost:8080
+//	@BasePath	/api
+
 func main() {
 	log := logger.New()
 	if err := mainNoExit(log); err != nil {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "survey/docs"
 	"survey/internal/db/repository/answerRepo"
 	"survey/internal/db/repository/surveyRepo"
 	"survey/internal/http/handlers/addAnswer"
@@ -22,8 +24,12 @@ func Router(db *sql.DB, router chi.Router, log logrus.FieldLogger) {
 	surveyUseCase := surveyUC.NewUseCase(surveyRepository)
 	answerUseCase := answerUC.NewUseCase(answerRepository)
 
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //The url pointing to API definition
+	))
+
 	router.Route("/api", func(r chi.Router) {
-		r.Post("/getResult", getResult.New(surveyUseCase, log))
+		r.Post("/get-result", getResult.New(surveyUseCase, log))
 		r.Post("/start-survey", startSurvey.New(surveyUseCase, log))
 		r.Delete("/delete-survey/{survey_id}", deleteSurvey.New(surveyUseCase, log))
 		r.Post("/add-ans", addAnswer.New(answerUseCase, log))

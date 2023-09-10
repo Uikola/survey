@@ -6,12 +6,24 @@ import (
 	"github.com/go-chi/render"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"survey/internal/entities"
 	"survey/internal/usecases/answerUC"
 )
 
 var ErrInvalidAID = errors.New("invalid answer id")
 var ErrInvalidSID = errors.New("invalid survey id")
 
+// New @Summary Vote
+//
+//	@Description	Votes for the answer
+//	@Tags			answer
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		Input	true	"Vote input"
+//	@Success		200		{object}	entities.Response
+//	@Failure		400		{object}	string
+//	@Failure		500		{object}	string
+//	@Router			/vote [post]
 func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -23,7 +35,7 @@ func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		err = validateReq(in)
+		err = ValidateReq(in)
 		if err != nil {
 			log.Errorf("can't validate the data: %s", err.Error())
 			http.Error(w, "bad json(validating): "+err.Error(), http.StatusBadRequest)
@@ -37,8 +49,6 @@ func New(uCase *answerUC.UseCase, log logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		render.JSON(w, r, map[string]interface{}{
-			"message": "vote counted successfully",
-		})
+		render.JSON(w, r, entities.Response{Message: "vote counted successfully"})
 	}
 }

@@ -1,0 +1,237 @@
+basePath: /api
+definitions:
+  addAnswer.Input:
+    properties:
+      survey_id:
+        type: integer
+      text:
+        type: string
+    type: object
+  entities.Answer:
+    properties:
+      id:
+        type: integer
+      surveyID:
+        type: integer
+      text:
+        type: string
+      votes:
+        type: integer
+    type: object
+  entities.Response:
+    properties:
+      message: {}
+    type: object
+  entities.Survey:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/entities.Answer'
+        type: array
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  getResult.Input:
+    properties:
+      survey_id:
+        type: integer
+    type: object
+  startSurvey.Input:
+    properties:
+      title:
+        type: string
+    type: object
+  vote.Input:
+    properties:
+      answer_id:
+        type: integer
+      survey_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Survey Application
+  title: Survey
+  version: "1.0"
+paths:
+  /add-ans:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new answer to the survey
+      parameters:
+      - description: addAnswer input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/addAnswer.Input'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Answer'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - answer
+  /delete-ans/{survey_id}/{ans_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an answer
+      parameters:
+      - description: Survey ID
+        in: path
+        name: survey_id
+        required: true
+        type: integer
+      - description: Answer ID
+        in: path
+        name: ans_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Response'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - answer
+  /delete-survey/{survey_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a survey
+      parameters:
+      - description: Survey ID
+        in: path
+        name: survey_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Response'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - survey
+  /get-result:
+    post:
+      consumes:
+      - application/json
+      description: Gets a result of the survey
+      parameters:
+      - description: Survey ID
+        in: body
+        name: survey_id
+        required: true
+        schema:
+          $ref: '#/definitions/getResult.Input'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Survey'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - survey
+  /start-survey:
+    post:
+      consumes:
+      - application/json
+      description: Starts a new survey
+      parameters:
+      - description: startSurvey input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/startSurvey.Input'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Survey'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - survey
+  /vote:
+    post:
+      consumes:
+      - application/json
+      description: Votes for the answer
+      parameters:
+      - description: Vote input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/vote.Input'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Response'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      tags:
+      - answer
+swagger: "2.0"
