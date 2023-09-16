@@ -1,0 +1,29 @@
+---
+
+services:
+  survey:
+    image: survey:local
+    ports:
+      - "8080:8080"
+    container_name: survey-app
+    depends_on:
+      - db
+    networks:
+      - ps
+
+  db:
+    image: postgres:14-alpine
+    container_name: survey-db
+    environment:
+      - POSTGRES_DB=survey_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ps
+
+networks:
+  ps:
