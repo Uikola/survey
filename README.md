@@ -58,7 +58,7 @@ To start the project, you need to perform the following actions
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/Uikola/survey.git
    ```
 2. Run go mod tidy
    ```sh
