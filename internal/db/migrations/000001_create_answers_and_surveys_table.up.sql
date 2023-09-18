@@ -3,8 +3,6 @@ CREATE TABLE surveys (
     title text NOT NULL
 );
 
-
-
 CREATE TABLE answers (
     id serial   NOT NULL unique,
     text text NOT NULL,
