@@ -43,12 +43,6 @@ This project is an application for creating and managing surveys. Here are the m
 - `DELETE /api/delete-ans/{survey_id}/{ans_id}`
 - `POST /api/vote` vote for the answer
 
-
-### Built With
-
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
-
 <!-- GETTING STARTED -->
 ## Getting Started
 
